@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de QSL Personalizadas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin:20px; background:#f0f0f0; }
+    .qsl-card {
+      width: 800px; height: 500px;
+      border: 2px solid #000;
+      position: relative;
+      margin-bottom: 20px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .qsl-info { background: rgba(0,0,0,0.5); padding: 10px; }
+    .form-section { margin-bottom: 20px; background:#fff; padding:10px; border-radius:5px; }
+    label { display:block; margin-top:5px; }
+    input, select { width:100%; padding:5px; }
+    table { border-collapse: collapse; width:100%; margin-top:10px; }
+    th, td { border:1px solid #ccc; padding:5px; font-size:14px; }
+    button { margin-top:10px; padding:8px 15px; }
+  </style>
+</head>
+<body>
+  <h1>Generador de QSL Personalizadas</h1>
+  <div class="form-section">
+    <h3>Subir Imagen de Fondo</h3>
+    <input type="file" id="bgUpload" accept="image/*">
+  </div>
+  <div class="form-section">
+    <h3>Datos de QSO Manuales</h3>
+    <label>Fecha <input type="date" id="qsoDate"></label>
+    <label>Callsign <input type="text" id="qsoCall"></label>
+    <label>Modo <input type="text" id="qsoMode"></label>
+    <label>Banda <input type="text" id="qsoBand"></label>
+    <label>Frecuencia <input type="text" id="qsoFreq"></label>
+    <label>RST <input type="text" id="qsoRst"></label>
+    <label>Nombre <input type="text" id="qsoName"></label>
+    <label>QTH <input type="text" id="qsoQth"></label>
+    <label>Notas <input type="text" id="qsoNotes"></label>
+    <button onclick="previewQSL()">Previsualizar</button>
+  </div>
+
+  <div class="qsl-card" id="qslCard">
+    <div class="qsl-info" id="qslInfo">
+      <div><strong>Fecha:</strong> <span id="infoDate"></span></div>
+      <div><strong>Callsign:</strong> <span id="infoCall"></span></div>
+      <div><strong>Modo:</strong> <span id="infoMode"></span></div>
+      <div><strong>Banda:</strong> <span id="infoBand"></span></div>
+      <div><strong>Frecuencia:</strong> <span id="infoFreq"></span></div>
+      <div><strong>RST:</strong> <span id="infoRst"></span></div>
+      <div><strong>Nombre:</strong> <span id="infoName"></span></div>
+      <div><strong>QTH:</strong> <span id="infoQth"></span></div>
+      <div><strong>Notas:</strong> <span id="infoNotes"></span></div>
+    </div>
+  </div>
+
+  <button onclick="downloadQSL()">Descargar QSL como PNG</button>
+
+<script>
+let bgImage = null;
+
+// Subir imagen de fondo
+const bgUpload = document.getElementById('bgUpload');
+bgUpload.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = ev => {
+      bgImage = ev.target.result;
+      document.getElementById('qslCard').style.backgroundImage = `url(${bgImage})`;
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+function previewQSL(){
+  document.getElementById('infoDate').innerText = document.getElementById('qsoDate').value;
+  document.getElementById('infoCall').innerText = document.getElementById('qsoCall').value;
+  document.getElementById('infoMode').innerText = document.getElementById('qsoMode').value;
+  document.getElementById('infoBand').innerText = document.getElementById('qsoBand').value;
+  document.getElementById('infoFreq').innerText = document.getElementById('qsoFreq').value;
+  document.getElementById('infoRst').innerText = document.getElementById('qsoRst').value;
+  document.getElementById('infoName').innerText = document.getElementById('qsoName').value;
+  document.getElementById('infoQth').innerText = document.getElementById('qsoQth').value;
+  document.getElementById('infoNotes').innerText = document.getElementById('qsoNotes').value;
+}
+
+function downloadQSL(){
+  const qslCard = document.getElementById('qslCard');
+  html2canvas(qslCard, {scale:2}).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `QSL_${document.getElementById('qsoCall').value || 'card'}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+}
+</script>
+</body>
+</html>
